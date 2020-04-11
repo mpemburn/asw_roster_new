@@ -21,7 +21,7 @@ use DB;
  */
 class Member extends Model
 {
-    //use FormAccessible;
+    use FormAccessible;
 
     protected $table = 'tblMembers';
 
