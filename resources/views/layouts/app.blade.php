@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.13/datatables.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.css">
-    <link rel="stylesheet" href="{{ URL::to('/public/css') }}/all.css">
+    <link rel="stylesheet" href="{{ $cssUrl }}/all.css">
 
 </head>
 <body id="app-layout">
@@ -40,25 +40,25 @@
             <div class="collapse navbar-collapse" id="app-navbar-collapse">
                 <!-- Left Side Of Navbar -->
                 <ul class="nav navbar-nav">
-                    @if (Auth::check())
+                    @if ($authUser)
                         <li><a href="{{ url('/home') }}">Home</a></li>
-                        <li class="nav-item dropdown {{ Request::is('member') ? 'active' : '' }}">
+                        <li class="nav-item dropdown {{ $memberStatusIs ? 'active' : '' }}">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Members <span class="caret"></span></a>
                             <ul class="dropdown-menu">
                                 <li class="dropdown-item"><a href="{{ url('/member') }}"><i class="fa fa-btn fa-users"></i> Members List</a></li>
                                 {{-- TODO: Move this to RolesService --}}
-                                @if (RosterAuth::userIsLeaderOrScribe())
+                                @if ($userIsLeaderOrScribe)
                                 <li class="dropdown-item"><a href="{{ url('/member/details') }}"><i class="fa fa-btn fa-user-plus"></i> Add Member</a></li>
                                 <li class="dropdown-item"><a href="{{ url('/member/missing') }}"><i class="fa fa-btn fa-bars"></i> Missing Data</a></li>
                                 @endif
                             </ul>
                         </li>
-                        @if (RosterAuth::userIsLeaderOrScribe())
-                        <li class="nav-item dropdown {{ Request::is('guild') ? 'active' : '' }}">
+                        @if ($userIsLeaderOrScribe)
+                        <li class="nav-item dropdown {{ $guildStatusIs ? 'active' : '' }}">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Guilds <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                    @foreach(GuildMembership::getGuilds() as $guild)
-                                    <li class="dropdown-item"><a href="{{ url('/guild/manage/') }}/{{ $guild->GuildID }}"><i class="fa fa-btn fa-user-plus"></i> {{ $guild->GuildName }}</a></li>
+                                    @foreach($guildList as $guildId => $guildName)
+                                    <li class="dropdown-item"><a href="{{ url('/guild/manage/') }}/{{ $guildId }}"><i class="fa fa-btn fa-user-plus"></i> {{ $guildName }}</a></li>
                                     @endforeach
                             </ul>
                         </li>
@@ -69,17 +69,17 @@
                 <!-- Right Side Of Navbar -->
                 <ul class="nav navbar-nav navbar-right">
                     <!-- Authentication Links -->
-                    @if (Auth::guest())
+                    @if ($guestUser)
                         <li><a href="{{ url('/login') }}">Login</a></li>
                         <li><a href="{{ url('/register') }}">Register</a></li>
                     @else
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                                {{ RosterAuth::getMemberName() }} <span class="caret"></span>
+                                {{ $memberName }} <span class="caret"></span>
                             </a>
 
                             <ul class="dropdown-menu" role="menu">
-                                <li><a href="{{ url('/member/details') }}/{{ Auth::user()->member_id }}"><i class="fa fa-btn fa-user-circle"></i> My Profile</a></li>
+                                <li><a href="{{ url('/member/details') }}/{{ $memberId }}"><i class="fa fa-btn fa-user-circle"></i> My Profile</a></li>
                                 <li><a href="{{ url('/profile/password') }}"><i class="fa fa-btn fa-user-secret"></i> Reset Password</a></li>
                                 <li><a href="{{ url('/logout') }}"><i class="fa fa-btn fa-sign-out"></i> Logout</a></li>
                             </ul>
@@ -107,6 +107,6 @@
     <!-- Add any dynamic scripts that were pushed in a template -->
     @stack('scripts')
     <!-- Add script compiled via gulp/elixir -->
-    <script src="{{ URL::to('/js') }}/all.js"></script>
+    <script src="{{ $jsUrl }}/all.js"></script>
 </body>
 </html>
