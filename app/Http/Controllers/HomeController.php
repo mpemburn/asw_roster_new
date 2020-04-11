@@ -9,11 +9,6 @@ use Illuminate\Support\Facades\URL;
 
 class HomeController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('auth');
@@ -24,7 +19,7 @@ class HomeController extends Controller
         return view('home', [
             'cssUrl' => URL::to('/public/css'),
             'jsUrl' => URL::to('/js'),
-            'authUser' => Auth::check(),
+            'authUser' => true, //Auth::check(),
             'guestUser' => Auth::guest(),
             'memberStatusIs' => (new Request())->is('member'),
             'guildStatusIs' => (new Request())->is('guild'),
