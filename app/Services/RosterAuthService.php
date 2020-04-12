@@ -2,19 +2,20 @@
 
 namespace App\Services;
 
+use App\User;
 use Illuminate\Support\Facades\Auth;
 use App\Facades\Membership;
 use App\Models\Role;
 
 class RosterAuthService
 {
+    /** @var User */
     protected $user;
     protected $member;
 
     public function __construct()
     {
         $this->user = Auth::user();
-
         if ($this->user !== null) {
             $this->member = Membership::getMemberById($this->user->member_id);
         }

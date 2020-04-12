@@ -21,7 +21,7 @@ class GlobalComposer
         ->with('guildStatusIs', (new Request())->is('guild'))
         ->with('memberName', RosterAuth::getMemberName())
         ->with('memberId', RosterAuth::getMemberId())
-        ->with('userIsLeaderOrScribe', true) // RosterAuth::userIsLeaderOrScribe()
+        ->with('userIsLeaderOrScribe', RosterAuth::userIsLeaderOrScribe())
         ->with('guildList', GuildMembership::getGuilds());
     }
 
