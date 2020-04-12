@@ -1,4 +1,11 @@
 @extends('layouts.app')
+@php
+
+use App\Facades\Membership;
+use App\Helpers\Utility;
+use App\Facades\Roles;
+
+@endphp
 @section('content')
     <div class="content">
         <table id="main_member_list" class="member-list">
