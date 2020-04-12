@@ -31,11 +31,9 @@ class GuildService {
         return ($guild_leader !== null);
     }
 
-    public function getGuilds()
+    public function getGuilds(): array
     {
-        $guilds = Guild::all();
-
-        return $guilds;
+        return Guild::all()->toArray();
     }
 
     public function getGuildName()
