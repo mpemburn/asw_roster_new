@@ -57,9 +57,11 @@
                         <li class="nav-item dropdown {{ $guildStatusIs ? 'active' : '' }}">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Guilds <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                    @foreach($guildList as $guildId => $guildName)
-                                    <li class="dropdown-item"><a href="{{ url('/guild/manage/') }}/{{ $guildId }}"><i class="fa fa-btn fa-user-plus"></i> {{ $guildName }}</a></li>
+                                @if($guildList)
+                                    @foreach($guildList as $guild)
+                                    <li class="dropdown-item"><a href="{{ url('/guild/manage/') }}/{{ $guild['GuildID'] }}"><i class="fa fa-btn fa-user-plus"></i> {{ $guild['GuildName'] }}</a></li>
                                     @endforeach
+                                @endif
                             </ul>
                         </li>
                         @endif

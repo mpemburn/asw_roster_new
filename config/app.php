@@ -179,6 +179,7 @@ return [
 
         /* Home-grown Service Providers */
         App\Providers\ServicesServiceProvider::class,
+        App\Providers\ViewServiceProvider::class,
     ],
 
     /*
