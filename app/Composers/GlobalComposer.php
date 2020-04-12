@@ -14,7 +14,7 @@ class GlobalComposer
     public function compose(View $view): void
     {
         $view->with('cssUrl', URL::to('/public/css'))
-        ->with('jsUrl', URL::to('/js'))
+        ->with('jsUrl', URL::to('/public/js'))
         ->with('authUser', Auth::check())
         ->with('guestUser', Auth::guest())
         ->with('memberStatusIs', (new Request())->is('member'))
