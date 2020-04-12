@@ -36,19 +36,19 @@ class RosterAuthService
         return $this->member ? $this->member->Coven : null;
     }
 
-    public function grantRoleToUser($user, $roleName): void
+    public function grantRoleToUser(User $user, string $roleName): void
     {
         if ($user && $roleName) {
             $role = Role::getRoleByName($roleName);
-            $user->attachRole($role);
+            $user->assignRole($role);
         }
     }
 
-    public function revokeRoleFromUser($user, $roleName): void
+    public function revokeRoleFromUser(User $user, string $roleName): void
     {
         if ($user && $roleName) {
             $role = Role::getRoleByName($roleName);
-            $user->detachRole($role);
+            $user->removeRole($role);
         }
     }
 
@@ -71,7 +71,7 @@ class RosterAuthService
             : false;
     }
 
-    public function isElder()
+    public function isElder(): bool
     {
         return $this->member ? (in_array($this->member->LeadershipRole, ['ELDER', 'CRF', 'CRM'])) : false;
     }
@@ -97,20 +97,6 @@ class RosterAuthService
         $isScribe = $this->isMemberOf('coven-scribe');
 
         return $isLeader || $isScribe;
-
-//            $leadershipRoleService = new RolesService();
-//            $valid_roles = $leadershipRoleService->getLeadershipRoleArray();
-//            $valid_roles[] = 'SCR';
-//
-//            $has_role = false;
-//            foreach ($valid_roles as $role) {
-//                if ($this->isMemberOf($role)) {
-//                    $has_role = true;
-//                    break;
-//                }
-//            }
-//
-//            return $has_role; //(in_array($this->member->LeadershipRole, $valid_roles));
     }
 
 }
