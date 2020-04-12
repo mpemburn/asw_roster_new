@@ -31,7 +31,11 @@ class MembersController extends Controller
     public function index()
     {
         $active = $this->member->getActiveMembers();
-        return view('members_list', $active);
+
+        return view('members_list',
+            [
+                'members' => $active['members']
+            ]);
     }
 
     /**
