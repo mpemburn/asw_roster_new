@@ -1,9 +1,9 @@
 <?php
 namespace App\Models;
 
-use Zizaco\Entrust\EntrustRole;
+use Spatie\Permission\Models\Role as SpatieRole;
 
-class Role extends EntrustRole
+class Role extends SpatieRole
 {
     protected $table = 'roles';
     protected $fillable = [
@@ -12,9 +12,8 @@ class Role extends EntrustRole
         'description'
     ];
 
-    public static function getRoleByName($name)
+    public static function getRoleByName($name): SpatieRole
     {
-        $role = self::where('name', $name);
-        return ($role->exists()) ? $role->get()->first() : null;
+        return self::findByName($name);
     }
 }
