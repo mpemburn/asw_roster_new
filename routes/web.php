@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('home');
 });
 
 Route::get('/test', 'TestController@show');
@@ -26,6 +26,11 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 // All Auth protected routes
 Route::group(['middlewareGroups' => 'web'], static function () {
+
+    Route::get('logout', [
+        'middleware' => ['auth'],
+        'uses' => 'Auth\LoginController@logout'
+    ]);
 
     Route::get('profile/password', [
         'middleware' => ['auth'],
