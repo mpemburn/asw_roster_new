@@ -1,105 +1,101 @@
 <?php
+
 namespace App\Services;
 
 use Illuminate\Support\Facades\Auth;
 use App\Facades\Membership;
 use App\Models\Role;
 
-class RosterAuthService {
+class RosterAuthService
+{
     protected $user;
     protected $member;
 
-    /**
-     * init
-     *
-     * Initialize properties with data pulled from the logged-in user
-     *
-     * @return void
-     */
-    public function init()
+    public function __construct()
     {
-        $success = false;
         $this->user = Auth::user();
-        if (!is_null($this->user)) {
+
+        if ($this->user !== null) {
             $this->member = Membership::getMemberById($this->user->member_id);
-            $success = true;
         }
-        return $success;
     }
 
     public function getMemberId()
     {
-        return ($this->init()) ? $this->member->MemberID : null;
+        return $this->member ? $this->member->MemberID : null;
     }
 
-    public function getMemberName()
+    public function getMemberName(): ?string
     {
-        return ($this->init()) ? $this->member->First_Name . ' ' . $this->member->Last_Name : null;
+        return $this->member ? $this->member->First_Name . ' ' . $this->member->Last_Name : null;
     }
 
-    public function getUserCoven()
+    public function getUserCoven(): ?string
     {
-        return ($this->init()) ? $this->member->Coven : null;
+        return $this->member ? $this->member->Coven : null;
     }
 
-    public function grantRoleToUser($user, $role_name)
+    public function grantRoleToUser($user, $roleName): void
     {
-        if ($this->init()) {
-            $role = Role::getRoleByName($role_name);
+        if ($user && $roleName) {
+            $role = Role::getRoleByName($roleName);
             $user->attachRole($role);
         }
     }
 
-    public function revokeRoleFromUser($user, $role_name)
+    public function revokeRoleFromUser($user, $roleName): void
     {
-        if ($this->init()) {
-            $role = Role::getRoleByName($role_name);
+        if ($user && $roleName) {
+            $role = Role::getRoleByName($roleName);
             $user->detachRole($role);
         }
     }
 
-    public function isAdmin()
+    public function isAdmin(): bool
     {
-        return ($this->init()) ? $this->user->hasRole('admin') : false;
+        return $this->user ? $this->user->hasRole('admin') : false;
     }
 
-    public function isCovenLeader($coven)
+    public function isCovenLeader($coven): bool
     {
-        return ($this->init()) ? ($this->member->Coven == $coven && $this->user->hasRole('coven-leader')) : false;
+        return $this->member && $this->user
+            ? ($this->member->Coven === $coven && $this->user->hasRole('coven-leader'))
+            : false;
     }
 
-    public function isCovenScribe($coven)
+    public function isCovenScribe($coven): bool
     {
-        return ($this->init()) ? ($this->member->Coven == $coven && $this->user->hasRole('coven-scribe')) : false;
+        return $this->member && $this->user
+            ? ($this->member->Coven === $coven && $this->user->hasRole('coven-scribe'))
+            : false;
     }
 
     public function isElder()
     {
-        return ($this->init()) ? (in_array($this->member->LeadershipRole, ['ELDER', 'CRF', 'CRM'])) : false;
+        return $this->member ? (in_array($this->member->LeadershipRole, ['ELDER', 'CRF', 'CRM'])) : false;
     }
 
-    public function isGuildLeader()
+    public function isGuildLeader(): bool
     {
-        return ($this->init()) ? $this->user->hasRole('guild-leader') : false;
+        return $this->user ? $this->user->hasRole('guild-leader') : false;
     }
 
-    public function isMemberOf($role_name)
+    public function isMemberOf($roleName): bool
     {
-        return ($this->init()) ? $this->user->hasRole($role_name) : false;
+        return $this->user && $roleName ? $this->user->hasRole($roleName) : false;
     }
 
-    public function isThisMember($member_id)
+    public function isThisMember($memberId): bool
     {
-        return ($this->init()) ? ($this->user->member_id == $member_id) : false;
+        return $this->user && $memberId ? ($this->user->member_id === $memberId) : false;
     }
 
-    public function userIsLeaderOrScribe()
+    public function userIsLeaderOrScribe(): bool
     {
-        if ($this->init()) {
-            $is_leader = $this->isMemberOf('coven-leader');
-            $is_scribe = $this->isMemberOf('coven-scribe');
+        $isLeader = $this->isMemberOf('coven-leader');
+        $isScribe = $this->isMemberOf('coven-scribe');
 
-            return $is_leader || $is_scribe;
+        return $isLeader || $isScribe;
 
 //            $leadershipRoleService = new RolesService();
 //            $valid_roles = $leadershipRoleService->getLeadershipRoleArray();
@@ -114,8 +110,6 @@ class RosterAuthService {
 //            }
 //
 //            return $has_role; //(in_array($this->member->LeadershipRole, $valid_roles));
-        }
-        return false;
     }
 
 }
