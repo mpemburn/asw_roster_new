@@ -9,74 +9,81 @@ use App\User;
 use App\Facades\Rbac;
 use App\Facades\Roles;
 use App\Helpers\Utility;
+use Illuminate\Support\Collection;
 
 class MembershipService
 {
+    /** @var Member $member */
     protected $member;
 
-    public function init()
+    public function __construct()
     {
         $this->member = new Member;
     }
-
+    
     /**
      * Retrieve all active members.
      *
-     * @param $member_id
-     * @return array
+     * @param int $status
+     * @return Collection|null
      */
-    public function getActiveMembers($status = 1)
+    public function getActiveMembers(int $status = 1): ?Collection
     {
-        $this->init();
-        $active_members = $this->member->where('Active', $status)
-            ->orderBy('Last_Name', 'asc')
-            ->get();
+        if ($this->member) {
+            return $this->member->where('Active', '=', $status)
+                ->orderBy('Last_Name', 'asc')
+                ->get();
+        }
 
-        return $active_members;
+        return null;
+
     }
 
 
-    public function getGuildMembers($guild_id)
+    public function getGuildMembers($guildId): ?Collection
     {
-        $this->init();
-        $guild_members = $this->member->where('Active', 1)
-            ->where('tblGuildMembers.GuildID', $guild_id)
-            ->join('tblGuildMembers', 'tblMembers.MemberID', '=', 'tblGuildMembers.MemberID')
-            ->orderBy('Last_Name', 'asc')
-            ->get();
+        if ($this->member) {
+            return $this->member->where('Active', '=', 1)
+                ->where('tblGuildMembers.GuildID', $guildId)
+                ->join('tblGuildMembers', 'tblMembers.MemberID', '=', 'tblGuildMembers.MemberID')
+                ->orderBy('Last_Name', 'asc')
+                ->get();
+        }
 
-        return $guild_members;
+        return null;
     }
 
     /**
      * Retrieve existing record or, if none, return an empty Member object for "new".
-     *
-     * @param $member_id
-     * @return mixed
+     * \
+     * @param int $memberId
+     * @return Collection|null
      */
-    public function getMemberById($member_id)
+    public function getMemberById(int $memberId): ?Collection
     {
-        $this->init();
-        return $this->member->firstOrNew(['MemberID' => $member_id]);
+        if ($this->member) {
+            return $this->member->firstOrNew(['MemberID' => $memberId]);
+        }
+
+        return null;
     }
 
     /**
      * Retrieve a member if email matches (single or in comma-delimited string)
      *
-     * @param $test_email
-     * @return Member
+     * @param $testEmail
+     * @return null|Member
      */
-    public function getMemberFromEmail($test_email)
+    public function getMemberFromEmail($testEmail): ?Member
     {
-        $member = null;
-        $found = Member::whereRaw('LOWER(`Email_Address`) LIKE ?', array('%' . strtolower($test_email) . '%'))
-            ->select('*')
-            ->get();
-        if (!$found->isEmpty()) {
-            $member = $found->first();
+        if ($this->member) {
+            return $this->member->whereRaw('LOWER(`Email_Address`) LIKE ?', array('%' . strtolower($testEmail) . '%'))
+                ->select('*')
+                ->get()
+                ->first();
         }
 
-        return $member;
+        return null;
     }
 
     /**
