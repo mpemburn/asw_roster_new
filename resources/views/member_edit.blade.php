@@ -1,4 +1,10 @@
 @extends('layouts.app')
+@php
+
+    use App\Facades\Membership;
+    use App\Helpers\Utility;
+
+@endphp
 @section('content')
     <div class="container">
         <div class="row">
