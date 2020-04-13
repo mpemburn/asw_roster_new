@@ -7,8 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Models\Role;
 use App\Models\Permission;
-use App\Models\User;
-use Rbac;
+use App\User;
+use App\Facades\Rbac;
 
 class RbacController extends Controller
 {

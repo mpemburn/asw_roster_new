@@ -305,11 +305,11 @@ class Member extends Model
      */
     private function getDropdowns()
     {
-        $prefix = Title::lists('Title', 'Title')->prepend('', '');
-        $suffix = Suffix::lists('Suffix', 'Suffix')->prepend('', '');
-        $state = State::lists('State', 'Abbrev')->prepend('State *', '');
-        $coven = Coven::lists('CovenFullName', 'Coven')->prepend('', '');
-        $degree = Degree::lists('Degree_Name', 'Degree');
+        $prefix = Title::pluck('Title', 'Title')->prepend('', '');
+        $suffix = Suffix::pluck('Suffix', 'Suffix')->prepend('', '');
+        $state = State::pluck('State', 'Abbrev')->prepend('State *', '');
+        $coven = Coven::pluck('CovenFullName', 'Coven')->prepend('', '');
+        $degree = Degree::pluck('Degree_Name', 'Degree');
         $leadership = Roles::leadershipDropdown();
         $board = Roles::boardDropdown();
 

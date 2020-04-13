@@ -129,7 +129,7 @@ class RolesService {
      */
     public function boardDropdown()
     {
-        return BoardRole::lists('BoardRole', 'BoardRole')->prepend('None', '');
+        return BoardRole::pluck('BoardRole', 'BoardRole')->prepend('None', '');
     }
 
     /**
@@ -141,7 +141,7 @@ class RolesService {
     {
         return LeadershipRole::where('GroupName', 'Leadership')
             ->where('LeadershipLevel', 'Coven')
-            ->lists('Description', 'Role')
+            ->pluck('Description', 'Role')
             ->prepend('None', '');
     }
 

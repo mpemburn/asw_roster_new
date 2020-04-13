@@ -7,7 +7,7 @@ use App\Models\Coven;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Models\Member;
-use App\Models\User;
+use App\User;
 use Illuminate\Support\Facades\Hash;
 use Validator;
 use DB;
@@ -51,9 +51,9 @@ class MembersController extends Controller
         $original_values = (is_array($request->values)) ? $request->values : null;
 
         if (!is_null($original_values)) {
-            $covens = Coven::whereIn('Coven', $original_values)->lists('CovenFullName', 'Coven');
+            $covens = Coven::whereIn('Coven', $original_values)->pluck('CovenFullName', 'Coven');
         } else {
-            $covens = Coven::lists('CovenFullName', 'Coven');
+            $covens = Coven::pluck('CovenFullName', 'Coven');
         }
         if (count($covens) > 0) {
             $covens_array = $covens->toArray();
@@ -66,12 +66,14 @@ class MembersController extends Controller
     /**
      * Display individual Member.
      *
-     * @return \Illuminate\Http\Response
+     * @param int $member_id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function memberDetails($member_id = 0)
+    public function memberDetails($memberId = 0)
     {
-        $this_member = $this->member->getDetails($member_id);
-        return view('member_edit', $this_member);
+        $memberData = $this->member->getDetails($memberId);
+
+        return view('member_edit', $memberData);
     }
 
     public function memberSearch(Request $request)

@@ -5,7 +5,7 @@ use App\Facades\RosterAuth;
 use App\Models\Coven;
 use App\Models\LeadershipRole;
 use App\Models\Member;
-use App\Models\User;
+use App\User;
 use App\Facades\Rbac;
 use App\Facades\Roles;
 use App\Helpers\Utility;
