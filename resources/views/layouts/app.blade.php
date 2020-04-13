@@ -53,7 +53,6 @@
                                 @endif
                             </ul>
                         </li>
-                        @if ($userIsLeaderOrScribe)
                         <li class="nav-item dropdown {{ $guildStatusIs ? 'active' : '' }}">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Guilds <span class="caret"></span></a>
                             <ul class="dropdown-menu">
@@ -64,7 +63,6 @@
                                 @endif
                             </ul>
                         </li>
-                        @endif
                     @endif
                 </ul>
 
