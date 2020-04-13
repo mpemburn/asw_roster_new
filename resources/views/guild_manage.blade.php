@@ -1,4 +1,11 @@
 @extends('layouts.app')
+@php
+
+    use App\Facades\Membership;
+    use App\Facades\GuildMembership;
+    use App\Helpers\Utility;
+
+@endphp
 @section('content')
     <div id="guild_manage" class="content col-md-10 col-md-offset-1">
         <h1>{{ GuildMembership::getGuildName() }}</h1>
@@ -56,7 +63,7 @@
         <!-- Push any scripts needed for this page onto the stack -->
 @push('scripts')
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" src="{{ URL::to('/') }}/js/lib/typeahead.bundle.min.js"></script>
+    <script type="text/javascript" src="{{ URL::to('/') }}public/js/lib/typeahead.bundle.min.js"></script>
     <script>
         appSpace.authTimeout = '{!! trans('auth.timeout') !!}';
         appSpace.canEdit = {!! ($can_edit) ? 'true' : 'false' !!};
