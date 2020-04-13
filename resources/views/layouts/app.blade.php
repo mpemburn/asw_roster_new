@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.13/datatables.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.css">
-    <link rel="stylesheet" href="{{ $cssUrl ?? '' }}/all.css">
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 
 </head>
 <body id="app-layout">
@@ -107,6 +107,6 @@
     <!-- Add any dynamic scripts that were pushed in a template -->
     @stack('scripts')
     <!-- Add script compiled via gulp/elixir -->
-    <script src="{{ $jsUrl }}/all.js"></script>
+    <script src="{{ asset('js/app.js') }}"></script>
 </body>
 </html>
