@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Facade;
  * @package App\Facades
  *
  * @method getGuilds
+ * @method isLeader($guildId, $memberId)
  */
 class GuildMembership extends Facade {
 

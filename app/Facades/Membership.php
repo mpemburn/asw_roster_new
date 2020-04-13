@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Facade;
  * @package App\Facades
  *
  * @method getMemberById($member_id)
+ * @method getGuildMembers($guildId)
+ * @method getPrimaryPhone($memberId)
  */
 class Membership extends Facade
 {
