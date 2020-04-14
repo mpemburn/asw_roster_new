@@ -2,6 +2,7 @@
 
 namespace App\Facades;
 
+use App\User;
 use Illuminate\Support\Facades\Facade;
 
 /**
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\Facade;
  * @method getMemberId
  * @method getMemberName
  * @method getUserCoven
- * @method grantRoleToUser
+ * @method grantRoleToUser(User $user, string $roleName)
  * @method isAdmin
  * @method isCovenLeader($coven)
  * @method isCovenScribe($coven)

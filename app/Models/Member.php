@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\CovenRoles;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Auth;
 use Collective\Html\Eloquent\FormAccessible;
 // Helpers and Facades
@@ -15,6 +16,9 @@ use App\Facades\Roles;
 
 /**
  * Class Member
+ * @package App\Models
+ *
+ * @mixin Builder
  */
 class Member extends Model
 {
@@ -77,11 +81,18 @@ class Member extends Model
         'PasswordWarnings'
     ];
 
-    protected $guarded = [];
+    protected $guarded = [
+        'MemberID'
+    ];
 
     protected $member;
     protected $member_id;
+    protected $MemberID;
 
+    public function getMemberId()
+    {
+        return $this->MemberID;
+    }
     /**
      * Get Member details for editing or static details if user lacks edit permission
      *

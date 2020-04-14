@@ -2,11 +2,19 @@
 
 namespace App;
 
+use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * Class User
+ * @package App
+ *
+ * @mixin Builder
+
+ */
 class User extends Authenticatable
 {
     use Notifiable;
@@ -36,6 +44,8 @@ class User extends Authenticatable
         'remember_token'
     ];
 
+    protected $member_id;
+
     /**
      * The attributes that should be cast to native types.
      *
@@ -44,6 +54,11 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function getMemberId(): int
+    {
+        return $this->member_id;
+    }
 
     public function setPassword($password): void
     {

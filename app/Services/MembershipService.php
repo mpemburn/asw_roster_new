@@ -20,7 +20,7 @@ class MembershipService
     {
         $this->member = new Member;
     }
-    
+
     /**
      * Retrieve all active members.
      *
@@ -55,17 +55,13 @@ class MembershipService
 
     /**
      * Retrieve existing record or, if none, return an empty Member object for "new".
-     * \
+     *
      * @param int $memberId
-     * @return Collection|null
+     * @return Member|null
      */
-    public function getMemberById(int $memberId): ?Collection
+    public function getMemberById(int $memberId): ?Member
     {
-        if ($this->member) {
-            return $this->member->firstOrNew(['MemberID' => $memberId]);
-        }
-
-        return null;
+        return Member::firstOrNew(['MemberID' => $memberId]);
     }
 
     /**
@@ -89,71 +85,83 @@ class MembershipService
     /**
      * Retrieve the MemberID if a matching email address is found
      *
-     * @param $test_email
+     * @param $testEmail
      * @return int
      */
-    public function getMemberIdFromEmail($test_email)
+    public function getMemberIdFromEmail($testEmail): ?int
     {
-        $member = $this->getMemberFromEmail($test_email);
-        return (!is_null($member)) ? $member->MemberID : 0;
+        $member = $this->getMemberFromEmail($testEmail);
+
+        return $member ? $member->getMemberId() : null;
     }
 
     /**
      * Retrieve the MemberID if a matching email address is found
      *
-     * @param $test_email
+     * @param $userId
      * @return int
      */
-    public function getMemberFromUserId($user_id)
+    public function getMemberFromUserId(int $userId): ?Member
     {
-        $member_id = $this->getMemberIdFromUserId($user_id);
-        return ($member_id !== 0) ? $this->getMemberById($member_id) : null;
+        $memberId = $this->getMemberIdFromUserId($userId);
+
+        return $memberId ? $this->getMemberById($memberId) : null;
     }
 
     /**
      * Retrieve the MemberID if a matching email address is found
      *
-     * @param $test_email
+     * @param $user_id
      * @return int
      */
-    public function getMemberIdFromUserId($user_id)
+    public function getMemberIdFromUserId(int $user_id): ?int
     {
+        /** @var User $user */
         $user = User::find($user_id);
-        return (!is_null($user)) ? $user->member_id : 0;
+
+        return $user ? $user->getMemberId() : 0;
     }
 
     /**
      * Get the phone number listed as "primary" from the member record
      *
-     * @param $member_id
-     * @return string
+     * @param $memberId
+     * @return string|null
      */
-    public function getPrimaryPhone($member_id)
+    public function getPrimaryPhone($memberId): ?string
     {
-        $member = $this->getMemberById($member_id);
-        $primary_id = $member->Primary_Phone;
-        if ($primary_id > 0) {
-            $phone_types = array('Home_Phone', 'Work_Phone', 'Cell_Phone');
-            $chosen = $phone_types[$primary_id - 1];
-            $phones = $member->where('MemberID', $member_id)
-                ->select($phone_types)
-                ->get();
-            $phone = $phones->first();
-            $primary_phone = (isset($phone[$chosen])) ? $phone[$chosen] : '';
-            return Utility::formatPhone($primary_phone);
+        $member = $this->getMemberById($memberId);
+        if ($member) {
+            $primaryPhoneId = $member->Primary_Phone;
+            if ($primaryPhoneId > 0) {
+                $phoneTypes = array('Home_Phone', 'Work_Phone', 'Cell_Phone');
+                $chosen = $phoneTypes[$primaryPhoneId - 1];
+                $phones = $member->where('MemberID', $memberId)
+                    ->select($phoneTypes)
+                    ->get();
+                $phone = $phones->first();
+                $primaryPhone = $phone[$chosen] ?? '';
+
+                return Utility::formatPhone($primaryPhone);
+            }
         }
-        return '';
+
+        return null;
     }
 
     /**
      * Retrieve data to display in member detail when user does not have edit permission
      *
-     * @param $member_id
-     * @return array
+     * @param $memberId
+     * @return array|null
      */
-    public function getStaticMemberData($member_id)
+    public function getStaticMemberData($memberId): ?array
     {
-        $member = $this->getMemberById($member_id);
+        $member = $this->getMemberById($memberId);
+        if (! $member) {
+            return null;
+        }
+
         $middle = (!empty($member->Middle_Name)) ? $member->Middle_Name . ' ' : '';
         $name = $member->Title . ' ' . $member->First_Name . ' ' . $middle . $member->Last_Name . ' ' . $member->Suffix;
         $coven = Coven::find($member->Coven);
@@ -161,7 +169,7 @@ class MembershipService
         $degree = Utility::ordinal($member->Degree);
         $bonded = ($member->Bonded) ? Utility::yesno($member->Bonded) : '';
         $solitary = ($member->Solitary) ? Utility::yesno($member->Solitary) : '';
-        $board = ($this->isCurrentBoardMember($member_id)) ? $member->BoardRole : '';
+        $board = ($this->isCurrentBoardMember($memberId)) ? $member->BoardRole : '';
         $board_expiry = date('M j, Y', strtotime($member->BoardRole_Expiry_Date));
 
         return [
@@ -173,9 +181,9 @@ class MembershipService
             'home_phone' => Utility::formatPhone($member->Home_Phone),
             'cell_phone' => Utility::formatPhone($member->Cell_Phone),
             'work_phone' => Utility::formatPhone($member->Work_Phone),
-            'coven' => (!is_null($coven)) ? $coven->CovenFullName : '',
-            'leadership' => (!is_null($leadership)) ? $leadership->Description : '',
-            'degree' => (!is_null($degree)) ? $degree : '',
+            'coven' => ($coven !== null) ? $coven->CovenFullName : '',
+            'leadership' => ($leadership !== null) ? $leadership->Description : '',
+            'degree' => $degree ?? '',
             'bonded' => $bonded,
             'solitary' => $solitary,
             'board' => $board,
@@ -183,43 +191,46 @@ class MembershipService
         ];
     }
 
-    public function getUserFromMemberId($member_id) {
-        $user = User::where('member_id', 185)->first();
-        return $user;
+    public function getUserFromMemberId($memberId): User
+    {
+        return User::where('member_id', '=', $memberId)->first();
     }
 
     /**
      * Test if the board member role is current
      *
-     * @param null $member_id
+     * @param null $memberId
      * @return bool
      */
-    public function isCurrentBoardMember($member_id = null)
+    public function isCurrentBoardMember($memberId = null): bool
     {
-        if (is_null($this->member->MemberID) && !is_null($member_id)) {
-            $this->member = $this->getMemberById($member_id);
-        }
-        $has_role = (!empty($this->member->BoardRole));
-        $expiry = $this->member->BoardRole_Expiry_Date;
-        if (!Utility::isDate($expiry)) {
-            return false;
-        }
-        $expired = (strtotime($expiry) < time());
+        $member = $this->getMemberById($memberId);
 
-        return ($has_role && !$expired);
+        if ($member) {
+            $has_role = (!empty($this->member->BoardRole));
+            $expiry = $this->member->BoardRole_Expiry_Date;
+            if (!Utility::isDate($expiry)) {
+                return false;
+            }
+            $expired = (strtotime($expiry) < time());
+
+            return ($has_role && !$expired);
+        }
+
+        return false;
     }
 
     /**
      * Test if email exists in members table
      *
-     * @param $test_email
+     * @param $testEmail
      * @return bool
      */
-    public function isValidEmail($test_email)
+    public function isValidEmail($testEmail): bool
     {
-        $member_id = $this->getMemberIdFromEmail($test_email);
+        $memberId = $this->getMemberIdFromEmail($testEmail);
 
-        return ($member_id != 0);
+        return ($memberId !== null);
     }
 
     /**
@@ -229,11 +240,12 @@ class MembershipService
      * @param $member_id
      * @return void
      */
-    public function postSaveMemberActions($changes, $member)
+    public function postSaveMemberActions($changes, Member $member)
     {
-        $member_id = $member->MemberID;
+        $memberId = $member->getMemberId();
+
         $coven = $member->Coven;
-        $user = $this->getUserFromMemberId($member_id);
+        $user = $this->getUserFromMemberId($memberId);
 
         // If leadership role has been added or changed, we need to rewrite role permissions
         if (array_key_exists('LeadershipRole', $changes)) {
@@ -242,13 +254,13 @@ class MembershipService
         // If PurseWarden status has changed, insert, update, or delete coven scribe record in CovenRoles
         if (array_key_exists('PurseWarden', $changes)) {
             $status = $changes['PurseWarden']['to'];
-            Roles::changePurseWardenRole($coven, $member_id, $status);
+            Roles::changePurseWardenRole($coven, $memberId, $status);
         }
         // If Scribe status has changed, insert, update, or delete coven scribe record in CovenRoles
         if (array_key_exists('Scribe', $changes)) {
             $status = $changes['Scribe']['to'];
-            Roles::changeScribeRole($coven, $member_id, $status);
-            if ($changes['Scribe']['to'] == 1) {
+            Roles::changeScribeRole($coven, $memberId, $status);
+            if ((int) $changes['Scribe']['to'] === 1) {
                 RosterAuth::grantRoleToUser($user, 'coven-scribe');
             } else {
                 RosterAuth::revokeRoleFromUser($user, 'coven-scribe');
@@ -259,13 +271,14 @@ class MembershipService
 
     /* Methods used in "Missing Data" page only */
 
-    public function boardExpired($member_id)
+    public function boardExpired($memberId): ?string
     {
-        $member = $this->getMemberById($member_id);
-
-        if ($this->isCurrentBoardMember($member_id)) {
+        if ($this->isCurrentBoardMember($memberId)) {
             return 'Active';
-        } else {
+        }
+
+        $member = $this->getMemberById($memberId);
+        if ($member) {
             $has_role = (!empty($member->BoardRole));
             $has_date = (Utility::isDate($member->BoardRole_Expiry_Date));
             $status = '';
@@ -278,30 +291,32 @@ class MembershipService
             return $status;
         }
 
+        return null;
     }
 
-    public function hasAll($member_fields)
+    public function hasAll(array $memberFields): string
     {
         $hasAll = true;
-        foreach ($member_fields as $field) {
+        foreach ($memberFields as $field) {
             $hasAll = ($hasAll && !empty($field));
         }
+
         return (!$hasAll) ? 'X' : '';
     }
 
-    public function hasNo($member_field)
+    public function hasNo($memberField): string
     {
-        return (empty($member_field)) ? 'X' : '';
+        return (empty($memberField)) ? 'X' : '';
     }
 
-    public function nonAlphaOrMissing($member_field)
+    public function nonAlphaOrMissing($memberField): string
     {
-        if (empty($member_field)) {
+        if (empty($memberField)) {
             return 'X';
-        } else {
-            $numbers = preg_replace('/[^0-9]/', '', $member_field);
-            return (empty($numbers)) ? 'X' : '';
         }
+        $numbers = preg_replace('/[^0-9]/', '', $memberField);
+        
+        return (empty($numbers)) ? 'X' : '';
     }
 
 }
