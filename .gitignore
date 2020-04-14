@@ -19,3 +19,4 @@ yarn-error.log
 /public/.DS_Store
 /.idea/roster.iml
 /.idea/php.xml
+/ssh_key.txt
