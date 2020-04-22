@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Class TblConstant
  */
-class TblConstant extends Model
+class Constant extends Model
 {
     protected $table = 'tblConstants';
 
@@ -24,5 +24,5 @@ class TblConstant extends Model
 
     protected $guarded = [];
 
-        
+
 }

@@ -109,3 +109,7 @@ Route::group(['middlewareGroups' => 'web'], static function () {
     */
 
 });
+
+Route::group(['middleware' => ['auth']], function() {
+    Route::resource('roles','RoleController');
+});
